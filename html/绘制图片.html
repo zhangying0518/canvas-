@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			canvas {
+				border: 1px solid #ccc;
+				display: block;
+				margin: 10px auto;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- <img src="../img/pic4.png" /> -->
+		<canvas  width="600" height="400"></canvas>
+		<script type="text/javascript">
+			var myCanvas = document.querySelector('canvas')
+			var ctx = myCanvas.getContext('2d')
+			
+			var image = new Image();
+			// 加载完成事件
+			image.onload = function(){
+				console.log(image)
+				// 第一种方式，三个参数
+				// ctx.drawImage(image,100,10)
+				// 第二种方式 五个参数
+				// ctx.drawImage(image,100,100,100,100)
+				// 第三种方式 9个参数
+				// 图片对象
+				// 图片上的定位坐标
+				// 在图片上截取多大的区域
+				// 绘制在画布上的坐标
+				// 图片的大小 不是裁剪 是缩放
+				ctx.drawImage(image,100,400,200,200,200,100,200,200)
+				
+			}
+			image.src = '../img/pic2.jpg'
+			
+		</script>
+	</body>
+</html>

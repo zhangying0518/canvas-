@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			canvas {
+				border: 1px solid #ccc;
+				display: block;
+				margin: 10px auto;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas  width="600" height="400"></canvas>
+		<script>
+			var myCanvas = document.querySelector('canvas')
+			var ctx = myCanvas.getContext('2d')
+			var PieChart = function(ctx){
+				// 绘制上下文
+				this.ctx = ctx || document.querySelector('canvas').getContext('2d')
+				// 饼图中心
+				this.w = this.ctx.canvas.width;
+				this.h = this.ctx.canvas.height;
+				// 圆心
+				this.x0 = this.w/2 + 60;
+				this.y0 = this.h/2;
+				// 半径
+				this.radius = 150
+				// 伸出去的线的长度
+				this.outLine = 20
+				// 矩形的大小 
+				this.rectW = 30
+				this.rectH = 16
+				this.space =10
+			}
+			// 初始化
+			PieChart.prototype.init = function(data){
+				this.drawPie(data)
+			}
+			// 画饼图
+			PieChart.prototype.drawPie = function(data){
+				var that = this
+				// 转化弧度
+				var angleList = this.transformAngle(data)
+				// 起始弧度
+				var startAngle = 0
+				angleList.forEach(function(item,i){
+					// 结束弧度
+					var endAngle = startAngle + item.angle
+					ctx.beginPath()
+					ctx.moveTo(that.x0,that.y0)
+					ctx.arc(that.x0,that.y0,that.radius,startAngle,endAngle)
+					// ctx.fillStyle = that.getRandomColor()
+					var color = ctx.fillStyle = that.getRandomColor()
+					ctx.fill()
+					// 绘制标题
+					that.Title(startAngle,item.angle,color,item.title)
+					// 下一次要使用当前这一次的结束弧度 所以
+					that.drawDesc(i,item.title)
+					startAngle = endAngle
+					
+				})
+			}
+			// 标题
+			PieChart.prototype.Title = function(startAngle,angle,color,titleWord){
+				// 角度转为弧度后的弧度 = 圆弧/2
+				this.ctx.beginPath()
+				// 斜边
+				var edge = this.radius + this.outLine
+				var edgeX = Math.cos(startAngle+angle/2)*edge
+				var edgeY = Math.sin(startAngle+angle/2)*edge
+				// 伸出去的点的坐标
+				var outX = this.x0 + edgeX
+				var outY = this.y0 + edgeY
+				this.ctx.beginPath()
+				this.ctx.moveTo(this.x0,this.y0)
+				this.ctx.lineTo(outX,outY)
+				this.ctx.strokeStyle = color
+				// 伸出去的点在下x0的哪边  用来决定放文字的线的终点坐标
+				this.ctx.font = '14px Microsoft Yahei'
+				var textWidth = this.ctx.measureText(titleWord).width
+				if(outX>this.x0){
+					// 在右边
+					this.ctx.lineTo(outX + textWidth,outY)
+					this.ctx.textAlign = 'left'
+				}else{
+					// 左边
+					this.ctx.lineTo(outX - textWidth,outY)
+					this.ctx.textAlign = 'right'
+				}
+				this.ctx.stroke()
+				this.ctx.textBaseline = 'bottom'
+				this.ctx.fillText(titleWord,outX,outY)
+			}
+			// 描述
+			PieChart.prototype.drawDesc = function(index,titleWord){
+				this.ctx.fillRect(this.space,this.space+index*(this.rectH+this.space),this.rectW,this.rectH)
+			    this.ctx.beginPath()
+				this.ctx.font = '12px Microsoft Yahei'
+				this.ctx.textAlign = 'left'
+				this.ctx.textBaseline = 'top'
+				this.ctx.fillText(titleWord,this.space+this.rectW+10,this.space+index*(this.rectH+this.space))
+			}
+			// 转化弧度
+			PieChart.prototype.transformAngle = function(data){
+				var total = 0;
+				data.forEach(function(item,i){
+					total += item.num
+				})
+				data.forEach(function(item,i){
+					var angle = item.num / total * Math.PI * 2
+					item.angle = angle
+				})
+				return data
+			}
+			// 随机颜色
+			PieChart.prototype.getRandomColor= function(){
+				var r = Math.floor(Math.random()*256);
+				var g = Math.floor(Math.random()*256);
+				var b = Math.floor(Math.random()*256);
+				return 'rgb('+r+','+g+','+b+')'
+			}
+			// 数据
+			var data = [
+				{
+					title:'14-20岁',
+					num:6
+					
+				},
+				{
+					title:'20-25岁',
+					num:30
+				},
+				{
+					title:'25-30岁',
+					num:10
+				},
+				{
+					title:'30岁以上',
+					num:8
+				}
+			]
+			var pieChart = new PieChart()
+			pieChart.init(data)
+		</script>
+	</body>
+</html>
